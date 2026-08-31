@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Coach AI OS — build structured AI coaching programs.">
+  <title>Coach AI OS</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0f172a; --card:#1e293b; --accent:#6366f1; --muted:#94a3b8; }
+    * { box-sizing: border-box; }
+    body { font-family: Inter, Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 24px; background:var(--bg); color:white; }
+    input, button, textarea { width:100%; padding:13px; margin:8px 0; border-radius:8px; border:1px solid #334155; font-size:16px; }
+    input, textarea { background:#111827; color:white; }
+    button { background:var(--accent); color:white; cursor:pointer; font-weight:700; border:0; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    .card { background:var(--card); padding:20px; border-radius:12px; margin-top:20px; }
+    .day { border-left:3px solid var(--accent); padding-left:15px; margin:16px 0; }
+    .muted { color:var(--muted); }
+    .error { color:#fca5a5; }
+    a { color:#c7d2fe; }
+  </style>
+</head>
+<body>
+  <h1>🤖 Coach AI OS</h1>
+  <p class="muted">Create a structured coaching program powered by AI.</p>
+
+  <form id="createProgram">
+    <label for="niche">Coaching niche</label>
+    <input id="niche" maxlength="120" placeholder="Life Coach, Fitness, Business" required>
+
+    <label for="goal">Student goal</label>
+    <input id="goal" maxlength="500" placeholder="Lose 10kg, improve sales, build confidence" required>
+
+    <label for="days">Program length</label>
+    <input id="days" type="number" min="1" max="90" value="21" required>
+
+    <button id="generateBtn" type="submit">Generate Program</button>
+  </form>
+
+  <div id="status" class="card" hidden></div>
+  <div id="output" class="card" hidden></div>
+
+  <script>
+    const form = document.getElementById("createProgram");
+    const output = document.getElementById("output");
+    const status = document.getElementById("status");
+    const btn = document.getElementById("generateBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      output.hidden = true;
+      status.hidden = false;
+      status.className = "card";
+      status.textContent = "Generating program…";
+      btn.disabled = true;
+
+      try {
+        const res = await fetch("/api/generate-program", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            niche: document.getElementById("niche").value.trim(),
+            goal: document.getElementById("goal").value.trim(),
+            days: Number(document.getElementById("days").value)
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Unable to generate program.");
+
+        const program = data.program;
+        output.innerHTML = "";
+        const title = document.createElement("h2");
+        title.textContent = program.title;
+        output.appendChild(title);
+
+        for (const d of program.days) {
+          const day = document.createElement("div");
+          day.className = "day";
+          day.innerHTML = `<strong>Day ${Number(d.day)}: </strong>`;
+          const lesson = document.createElement("span");
+          lesson.textContent = d.lesson;
+          const action = document.createElement("p");
+          action.textContent = `Action: ${d.action}`;
+          day.append(lesson, action);
+          output.appendChild(day);
+        }
+
+        output.hidden = false;
+        status.hidden = true;
+      } catch (err) {
+        status.className = "card error";
+        status.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

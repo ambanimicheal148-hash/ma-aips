@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your AI Coach</title>
+  <style>
+    body { background:#0f172a;color:white;font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px; }
+    #chat { height:400px; overflow-y:auto; background:#1e293b;padding:15px;border-radius:8px; }
+    .msg { margin:10px 0;padding:8px;border-radius:8px; }
+    .user { text-align:right;color:#c7d2fe; }
+    input,button { width:100%;padding:12px;margin-top:10px;border-radius:8px;border:0;font-size:16px; }
+    input { background:#111827;color:white;border:1px solid #334155; }
+    button { background:#6366f1;color:white;font-weight:bold; }
+  </style>
+</head>
+<body>
+  <h2 id="heading">Your AI Coach</h2>
+  <div id="chat" aria-live="polite"></div>
+
+  <form id="chatForm">
+    <input id="input" maxlength="4000" placeholder="Ask your coach anything..." autocomplete="off" required>
+    <button id="sendBtn">Send</button>
+  </form>
+
+<script>
+const params = new URLSearchParams(location.search);
+const studentId = Number(params.get("student_id"));
+const chatBox = document.getElementById("chat");
+const input = document.getElementById("input");
+const form = document.getElementById("chatForm");
+const sendBtn = document.getElementById("sendBtn");
+
+function addMessage(label, text, cls = "") {
+  const div = document.createElement("div");
+  div.className = `msg ${cls}`;
+  div.textContent = `${label}: ${text}`;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function loadStudent() {
+  if (!Number.isInteger(studentId) || studentId < 1) {
+    addMessage("System", "Open this page with ?student_id=<your student id>.");
+    input.disabled = true;
+    sendBtn.disabled = true;
+    return;
+  }
+
+  const res = await fetch(`/api/students/${studentId}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Unable to load student.");
+
+  const p = data.student.program;
+  document.getElementById("heading").textContent =
+    `Day ${data.student.current_day}: ${p.title}`;
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const message = input.value.trim();
+  if (!message || !studentId) return;
+
+  input.value = "";
+  addMessage("You", message, "user");
+  sendBtn.disabled = true;
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ student_id: studentId, message })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Chat failed.");
+    addMessage("AI", data.reply);
+  } catch (err) {
+    addMessage("System", err.message);
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
+  }
+});
+
+loadStudent().catch(err => addMessage("System", err.message));
+</script>
+</body>
+</html>
