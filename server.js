@@ -31,6 +31,13 @@ app.get('/api/student', (req, res) => {
 app.post('/api/chat', (req, res) => {
   res.json({ reply: 'Hello! MA-AIPS AI is working. You said: ' + (req.body.message || 'hi') });
 });
-
 app.get('/api/:anything', (req, res) => {
-  res.json({ message
+  res.json({ message: 'API works', path: req.path });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Server running');
+});
+
+module.exports = app;
