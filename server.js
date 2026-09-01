@@ -1,50 +1,61 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const app = express();
-app.use(cors());
-app.use(express.json());
+module.exports = async (req, res) => {
+  // Allow CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-const GEMINI_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-1.5-flash-latest';
-
-// Serve static files if public folder exists
-const publicPath = path.join(__dirname, 'public');
-if (fs.existsSync(publicPath)) {
-  app.use(express.static(publicPath));
-}
-
-app.post('/api/ai', async (req, res) => {
-  try {
-    if (!GEMINI_KEY) return res.json({ reply: 'Server Error: GEMINI_API_KEY missing in Vercel' });
-    const prompt = req.body.prompt || req.body.message || 'Hello';
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || JSON.stringify(data));
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No answer from Gemini';
-    res.json({ reply: text });
-  } catch (e) {
-    console.error(e);
-    res.json({ reply: 'AI Error: ' + e.message });
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
-});
 
-app.get('*', (req, res) => {
-  const indexPath = path.join(__dirname, 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    // fallback if no public folder
-    res.send(`<!DOCTYPE html><html><head><title>MA-AIPS</title></head><body><h1>MA-AIPS is Running!</h1><p>Test: <a href="/?student_id=TEST123">/?student_id=TEST123</a></p><div id="r"></div><script>
-    async function test(){const res=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:'Say hello in 5 words'})});const d=await res.json();document.getElementById('r').innerText=JSON.stringify(d)}
-    test();
-    </script></body></html>`);
+  // Handle AI API
+  if (req.url.startsWith('/api/ai') && req.method === 'POST') {
+    try {
+      let body = '';
+      for await (const chunk of req) body += chunk;
+      const { prompt } = JSON.parse(body || '{}');
+      const GEMINI_KEY = process.env.GEMINI_API_KEY;
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt || 'Hello' }] }] })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || 'Gemini error');
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No answer';
+      return res.json({ reply: text });
+    } catch (e) {
+      return res.json({ reply: 'AI Error: ' + e.message });
+    }
   }
-});
 
-module.exports = app;
+  // Serve HTML for everything else
+  const html = `<!DOCTYPE html>
+  <html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MA-AIPS</title>
+  <style>body{font-family:sans-serif;padding:20px;max-width:600px;margin:auto}#chat{border:1px solid #ccc;height:300px;overflow:auto;padding:10px;margin:10px 0}input{width:70%;padding:10px}button{padding:10px}</style>
+  </head><body>
+  <h2>MA-AIPS 🤖</h2>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Type message..."><button onclick="send()">Send</button>
+  <script>
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('student_id') || 'Guest';
+  document.getElementById('chat').innerHTML += '<div><b>Welcome '+sid+'!</b></div>';
+  async function send(){
+    const input = document.getElementById('msg');
+    const text = input.value;
+    if(!text) return;
+    const chat = document.getElementById('chat');
+    chat.innerHTML += '<div><b>You:</b> '+text+'</div>';
+    input.value='';
+    const res = await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:text})});
+    const data = await res.json();
+    chat.innerHTML += '<div><b>AI:</b> '+data.reply+'</div>';
+    chat.scrollTop = chat.scrollHeight;
+  }
+  </script></body></html>`;
+
+  res.setHeader('Content-Type', 'text/html');
+  return res.send(html);
+};
