@@ -1,1 +1,53 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K.AI.S</title><style>body{font-family:sans-serif;background:#f5f5f0;color:#111;margin:0}header{background:#000;color:#fff;padding:15px;display:flex;justify-content:space-between}select,input,button{padding:12px;border-radius:8px;border:1px solid #ccc}.wrap{max-width:800px;margin:20px auto;padding:0 15px}.card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:15px}.disclaimer{background:#fff3cd;border:1px solid #ffc107;padding:12px;border-radius:8px;font-size:12px;margin-bottom:15px}</style></head><body><header><b>🇰🇪 K.AI.S</b><a href="/" style="color:#fff;text-decoration:none">Home</a></header><div class="wrap"><div class="disclaimer">⚠️ Independent tech, NOT GoK. Verify on eCitizen/Huduma/KRA.</div><div class="card"><select id="lang"><option value="en">English</option><option value="sw">Kiswahili</option><option value="sheng">Sheng</option><option value="luo">Dholuo</option></select><div style="display:flex;gap:10px;margin-top:10px"><input id="q" placeholder="How to apply good conduct?" style="flex:1"><button onclick="ask()" style="background:#00aaff;color:#fff;border:0">Ask</button></div></div><div id="ans"></div></div><script>async function ask(){const q=document.getElementById('q').value,l=document.getElementById('lang').value;if(!q)return;document.getElementById('ans').innerHTML='<div class=card>Thinking...</div>';try{const r=await fetch('/api/kais/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,language:l,session_id:'kais-'+Date.now()})});const d=await r.json();document.getElementById('ans').innerHTML='<div class=card><div style="white-space:pre-wrap">'+(d.reply||d.error)+'</div><hr><small>'+(d.disclaimer||'')+'</small></div>'}catch{document.getElementById('ans').innerHTML='<div class=card>Offline</div>'}}</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>K.AI.S Master AI</title>
+  <style>
+    body{font-family:sans-serif;background:#f5f5f0;color:#111;margin:0}
+    header{background:#000;color:#fff;padding:15px;display:flex;justify-content:space-between}
+    select,input,button{padding:12px;border-radius:8px;border:1px solid #ccc}
+    .wrap{max-width:800px;margin:20px auto;padding:0 15px}
+    .card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:15px}
+    .disclaimer{background:#fff3cd;border:1px solid #ffc107;padding:12px;border-radius:8px;font-size:12px;margin-bottom:15px}
+    .flow{font-weight:700;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <header><b>🇰🇪 K.AI.S MASTER AI</b><a href="/" style="color:#fff;text-decoration:none">Home</a></header>
+  <div class="wrap">
+    <div class="disclaimer">⚠️ Independent technology. Verify official government information on the appropriate official service.</div>
+    <div class="card">
+      <select id="lang">
+        <option value="English">English</option>
+        <option value="Kiswahili">Kiswahili</option>
+        <option value="Sheng">Sheng</option>
+        <option value="Dholuo">Dholuo</option>
+      </select>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <input id="q" placeholder="Ask K.AI.S..." style="flex:1">
+        <button id="askBtn" onclick="ask()" style="background:#00aaff;color:#fff;border:0">Ask</button>
+      </div>
+    </div>
+    <div id="ans"></div>
+  </div>
+  <script>
+    async function ask(){
+      const q=document.getElementById('q').value.trim();
+      const language=document.getElementById('lang').value;
+      const button=document.getElementById('askBtn');
+      if(!q)return;
+      button.disabled=true;
+      document.getElementById('ans').innerHTML='<div class="card">MASTER AI routing...</div>';
+      try{
+        const r=await fetch('/api/master',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,language})});
+        const d=await r.json();
+        document.getElementById('ans').innerHTML=`<div class="card"><div class="flow">MASTER AI → ${d.routedTo||'CORE'}</div><div style="white-space:pre-wrap">${d.reply||d.error||'No response'}</div><hr><small>Approval state: ${d.approvalRequired?'HUMAN APPROVAL REQUIRED':'No additional approval flag'}</small></div>`;
+      }catch(e){
+        document.getElementById('ans').innerHTML='<div class="card">MASTER AI is currently unavailable.</div>';
+      }finally{button.disabled=false;}
+    }
+  </script>
+</body>
+</html>
