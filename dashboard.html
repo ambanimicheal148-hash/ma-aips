@@ -1,143 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>MA-AIPS Dashboard</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: #020617;
-      color: #f8fafc;
-      font-family: Arial, Helvetica, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    main {
-      width: min(700px, 92%);
-      padding: 32px 20px;
-      text-align: center;
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: 32px;
-    }
-
-    p {
-      color: #cbd5e1;
-      line-height: 1.6;
-    }
-
-    .actions {
-      margin-top: 28px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    a {
-      display: inline-block;
-      padding: 14px 20px;
-      border-radius: 10px;
-      background: #6366f1;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    a:hover {
-      opacity: 0.9;
-    }
-
-    .status {
-      margin-top: 28px;
-      padding: 16px;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      background: #0f172a;
-    }
-
-    #apiStatus {
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K.AI.S Security Command | MA-AIPS</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#020617;color:#f8fafc;font-family:Arial,Helvetica,sans-serif}
+main{width:min(1000px,94%);margin:0 auto;padding:28px 0 50px}header{padding:24px 0}
+h1{margin:0 0 8px;font-size:32px}.sub{color:#94a3b8}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:#0f172a;border:1px solid #334155;border-radius:14px;padding:18px}.guard{font-size:22px;font-weight:800}
+.status{margin-top:8px;font-weight:700}.ok{color:#86efac}.standby{color:#fde68a}
+.stats{display:flex;gap:20px;flex-wrap:wrap;margin-top:18px}.stat{background:#111827;padding:12px 16px;border-radius:10px}
+#events{margin-top:18px}.event{padding:10px 0;border-bottom:1px solid #1e293b;font-size:14px}
+a{color:#c4b5fd;text-decoration:none}button{margin-top:18px;padding:10px 14px;border:0;border-radius:9px;cursor:pointer}
+@media(max-width:700px){.grid{grid-template-columns:1fr}}
+</style>
 </head>
-
-<body>
-
-  <main>
-
-    <h1>MA-AIPS Dashboard</h1>
-
-    <p>
-      Autonomous Intelligence Platform
-    </p>
-
-    <div class="actions">
-
-      <a href="/student.html?student_id=TEST123">
-        Open AI Coach
-      </a>
-
-      <a href="/api/health">
-        Check API
-      </a>
-
-    </div>
-
-    <div class="status">
-
-      <p>
-        Platform status:
-        <span id="apiStatus">
-          Checking...
-        </span>
-      </p>
-
-    </div>
-
-  </main>
-
-  <script>
-    async function checkAPI() {
-      const status = document.getElementById("apiStatus");
-
-      try {
-        const response = await fetch("/api/health");
-
-        if (!response.ok) {
-          throw new Error("API unavailable");
-        }
-
-        const data = await response.json();
-
-        if (data?.status === "ok") {
-          status.textContent = "Online";
-        } else {
-          status.textContent = "Available";
-        }
-      } catch (error) {
-        status.textContent = "Unavailable";
-      }
-    }
-
-    checkAPI();
-  </script>
-
-</body>
-</html>
+<body><main>
+<header><h1>🛡️ K.AI.S Cyber Defense Command</h1><div class="sub">MA-AIPS • “No Sleep. No Breach. No Data Lost.”</div></header>
+<section class="grid">
+<div class="card"><div class="guard">WALL</div><div>Firewall / Rate Guard</div><div id="wall" class="status">Checking…</div></div>
+<div class="card"><div class="guard">EYE</div><div>Security Monitor</div><div id="eye" class="status">Checking…</div></div>
+<div class="card"><div class="guard">GHOST</div><div>Ethical Security Tester</div><div id="ghost" class="status standby">Standby</div></div>
+</section>
+<section class="stats"><div class="stat">Incidents: <b id="incidents">—</b></div><div class="stat">High/Critical: <b id="high">—</b></div><div class="stat">Last update: <b id="updated">—</b></div></section>
+<section class="card" id="events"><b>Recent security events</b><div id="eventList">Loading…</div></section>
+<button onclick="loadSecurity()">Refresh now</button>
+<p><a href="/">← MA-AIPS home</a> · <a href="/student.html?student_id=TEST123">AI Coach</a></p>
+</main>
+<script>
+async function loadSecurity(){
+ try{
+  const r=await fetch("/api/security?guard=all",{cache:"no-store"});
+  const d=await r.json();
+  document.getElementById("wall").textContent=d.guards?.WALL||"Unknown";
+  document.getElementById("wall").className="status ok";
+  document.getElementById("eye").textContent=d.guards?.EYE||"Unknown";
+  document.getElementById("eye").className="status ok";
+  document.getElementById("ghost").textContent=d.guards?.GHOST||"Unknown";
+  document.getElementById("incidents").textContent=d.last24h?.incidents??"—";
+  document.getElementById("high").textContent=d.last24h?.highSeverity??"—";
+  document.getElementById("updated").textContent=new Date().toLocaleTimeString();
+  const events=d.recentEvents||[];
+  document.getElementById("eventList").innerHTML=events.length
+   ? events.map(e=>"<div class='event'><b>"+e.severity.toUpperCase()+"</b> · "+e.type+" · "+new Date(e.timestamp).toLocaleString()+"</div>").join("")
+   : "<div class='event'>No security incidents recorded in this serverless instance.</div>";
+ }catch(e){document.getElementById("eye").textContent="Unavailable";document.getElementById("eventList").textContent="Security API unavailable";}
+}
+loadSecurity();setInterval(loadSecurity,5000);
+</script></body></html>
