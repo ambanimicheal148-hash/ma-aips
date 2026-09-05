@@ -19,34 +19,27 @@
   <div class="wrap">
     <div class="disclaimer">⚠️ Independent technology. Verify official government information on the appropriate official service.</div>
     <div class="card">
-      <select id="lang">
-        <option value="English">English</option>
-        <option value="Kiswahili">Kiswahili</option>
-        <option value="Sheng">Sheng</option>
-        <option value="Dholuo">Dholuo</option>
-      </select>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <input id="q" placeholder="Ask K.AI.S..." style="flex:1">
-        <button id="askBtn" onclick="ask()" style="background:#00aaff;color:#fff;border:0">Ask</button>
-      </div>
+      <select id="lang"><option value="English">English</option><option value="Kiswahili">Kiswahili</option><option value="Sheng">Sheng</option><option value="Dholuo">Dholuo</option></select>
+      <div style="display:flex;gap:10px;margin-top:10px"><input id="q" placeholder="Ask K.AI.S..." style="flex:1"><button id="askBtn" onclick="ask()" style="background:#00aaff;color:#fff;border:0">Ask</button></div>
     </div>
     <div id="ans"></div>
   </div>
   <script>
     async function ask(){
-      const q=document.getElementById('q').value.trim();
-      const language=document.getElementById('lang').value;
-      const button=document.getElementById('askBtn');
+      const q=document.getElementById('q').value.trim(), language=document.getElementById('lang').value, button=document.getElementById('askBtn'), ans=document.getElementById('ans');
       if(!q)return;
-      button.disabled=true;
-      document.getElementById('ans').innerHTML='<div class="card">MASTER AI routing...</div>';
+      button.disabled=true; ans.textContent='MASTER AI routing...';
       try{
         const r=await fetch('/api/master',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,language})});
         const d=await r.json();
-        document.getElementById('ans').innerHTML=`<div class="card"><div class="flow">MASTER AI → ${d.routedTo||'CORE'}</div><div style="white-space:pre-wrap">${d.reply||d.error||'No response'}</div><hr><small>Approval state: ${d.approvalRequired?'HUMAN APPROVAL REQUIRED':'No additional approval flag'}</small></div>`;
-      }catch(e){
-        document.getElementById('ans').innerHTML='<div class="card">MASTER AI is currently unavailable.</div>';
-      }finally{button.disabled=false;}
+        const card=document.createElement('div'); card.className='card';
+        const flow=document.createElement('div'); flow.className='flow'; flow.textContent=`MASTER AI → ${d.routedTo||'CORE'}`;
+        const reply=document.createElement('div'); reply.style.whiteSpace='pre-wrap'; reply.textContent=d.reply||d.error||'No response';
+        const hr=document.createElement('hr');
+        const state=document.createElement('small'); state.textContent=`Approval state: ${d.approvalRequired?'HUMAN APPROVAL REQUIRED':'No additional approval flag'}`;
+        card.append(flow,reply,hr,state); ans.replaceChildren(card);
+      }catch(e){ ans.textContent='MASTER AI is currently unavailable.'; }
+      finally{button.disabled=false;}
     }
   </script>
 </body>
