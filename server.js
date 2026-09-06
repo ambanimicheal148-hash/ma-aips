@@ -10,12 +10,8 @@ const API_ROUTES = {
   "/api/health": "./api/health.js",
   "/api/student": "./api/student.js",
   "/api/chat": "./api/chat.js",
-  "/api/ask": "./api/ask.js",
-  "/api/dashboard": "./api/dashboard.js",
-  "/api/kais-ai": "./api/kais-ai.js",
-  "/api/mbna": "./api/mbna.js",
-  "/api/mcb-ai": "./api/mcb-ai.js",
-  "/api/pipeline-ingest": "./api/pipeline-ingest.js"
+  "/api/kais/chat": "./api/kais/chat.js",
+  "/api/mbna/program": "./api/mbna/program.js"
 };
 
 const MIME = {
