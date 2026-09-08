@@ -1,46 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>K.AI.S Master AI</title>
-  <style>
-    body{font-family:sans-serif;background:#f5f5f0;color:#111;margin:0}
-    header{background:#000;color:#fff;padding:15px;display:flex;justify-content:space-between}
-    select,input,button{padding:12px;border-radius:8px;border:1px solid #ccc}
-    .wrap{max-width:800px;margin:20px auto;padding:0 15px}
-    .card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-bottom:15px}
-    .disclaimer{background:#fff3cd;border:1px solid #ffc107;padding:12px;border-radius:8px;font-size:12px;margin-bottom:15px}
-    .flow{font-weight:700;margin-bottom:12px}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>K.AI.S Master AI</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#020617;color:#f8fafc;font-family:Arial,sans-serif}.shell{width:min(920px,94%);margin:auto;padding:24px 0 50px}.top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid #1e293b;border-radius:16px;background:#0b1220}.brand{font-weight:800;letter-spacing:.4px}.home{color:#cbd5e1;text-decoration:none}.hero{text-align:center;padding:42px 12px 24px}.hero h1{font-size:clamp(34px,8vw,62px);margin:0 0 10px}.hero p{color:#94a3b8;line-height:1.6;margin:0 auto;max-width:650px}.card{background:#0b1220;border:1px solid #1e293b;border-radius:18px;padding:18px;margin-top:16px;box-shadow:0 12px 35px rgba(0,0,0,.22)}.row{display:flex;gap:10px}.row input{flex:1}.input,select,button{font:inherit;padding:13px 14px;border-radius:11px;border:1px solid #334155;background:#020617;color:#f8fafc}.ask{background:#2563eb;border:0;font-weight:700;min-width:90px}.ask:disabled{opacity:.6}.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:#94a3b8}.pill{border:1px solid #334155;border-radius:999px;padding:6px 9px}.reply{white-space:pre-wrap;line-height:1.7}.status{color:#94a3b8;font-size:12px;margin-top:12px}.memory{color:#86efac}.disclaimer{font-size:12px;color:#cbd5e1;margin-top:12px;padding:10px 12px;border:1px solid #334155;border-radius:10px}
+@media(max-width:600px){.row{flex-direction:column}.ask{width:100%}}
+</style>
 </head>
 <body>
-  <header><b>🇰🇪 K.AI.S MASTER AI</b><a href="/" style="color:#fff;text-decoration:none">Home</a></header>
-  <div class="wrap">
-    <div class="disclaimer">⚠️ Independent technology. Verify official government information on the appropriate official service.</div>
-    <div class="card">
-      <select id="lang"><option value="English">English</option><option value="Kiswahili">Kiswahili</option><option value="Sheng">Sheng</option><option value="Dholuo">Dholuo</option></select>
-      <div style="display:flex;gap:10px;margin-top:10px"><input id="q" placeholder="Ask K.AI.S..." style="flex:1"><button id="askBtn" onclick="ask()" style="background:#00aaff;color:#fff;border:0">Ask</button></div>
-    </div>
-    <div id="ans"></div>
+<div class="shell">
+  <header class="top"><div class="brand">K.AI.S • MASTER AI</div><a class="home" href="/">Home</a></header>
+  <section class="hero"><h1>Master AI</h1><p>Intelligent routing, Council reasoning and long-term conversational memory for MA-AIPS.</p></section>
+  <div class="card">
+    <select id="lang"><option value="English">English</option><option value="Kiswahili">Kiswahili</option><option value="Sheng">Sheng</option><option value="Dholuo">Dholuo</option></select>
+    <div class="row" style="margin-top:10px"><input class="input" id="q" placeholder="Ask K.AI.S anything..." autocomplete="off"><button class="ask" id="askBtn" onclick="ask()">Ask</button></div>
+    <div class="disclaimer">K.AI.S remembers conversations only when persistent memory storage is configured. It will not invent historical events that are absent from its memory.</div>
   </div>
-  <script>
-    async function ask(){
-      const q=document.getElementById('q').value.trim(), language=document.getElementById('lang').value, button=document.getElementById('askBtn'), ans=document.getElementById('ans');
-      if(!q)return;
-      button.disabled=true; ans.textContent='MASTER AI routing...';
-      try{
-        const r=await fetch('/api/master',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,language})});
-        const d=await r.json();
-        const card=document.createElement('div'); card.className='card';
-        const flow=document.createElement('div'); flow.className='flow'; flow.textContent=`MASTER AI → ${d.routedTo||'CORE'}`;
-        const reply=document.createElement('div'); reply.style.whiteSpace='pre-wrap'; reply.textContent=d.reply||d.error||'No response';
-        const hr=document.createElement('hr');
-        const state=document.createElement('small'); state.textContent=`Approval state: ${d.approvalRequired?'HUMAN APPROVAL REQUIRED':'No additional approval flag'}`;
-        card.append(flow,reply,hr,state); ans.replaceChildren(card);
-      }catch(e){ ans.textContent='MASTER AI is currently unavailable.'; }
-      finally{button.disabled=false;}
-    }
-  </script>
+  <div id="ans"></div>
+</div>
+<script>
+const history=[];
+function getMemoryId(){let id=localStorage.getItem('kais_memory_id');if(!id){id='m_'+crypto.randomUUID();localStorage.setItem('kais_memory_id',id)}return id}
+async function ask(){
+ const input=document.getElementById('q'),q=input.value.trim(),language=document.getElementById('lang').value,button=document.getElementById('askBtn'),ans=document.getElementById('ans');
+ if(!q)return;button.disabled=true;ans.innerHTML='<div class="card">K.AI.S is thinking…</div>';
+ try{
+  const r=await fetch('/api/master',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,language,memory_id:getMemoryId(),history})});
+  const d=await r.json();
+  if(d.reply){history.push({role:'user',content:q},{role:'assistant',content:d.reply});while(history.length>12)history.shift()}
+  const card=document.createElement('div');card.className='card';
+  const flow=document.createElement('div');flow.className='meta';flow.innerHTML='<span class="pill">MASTER AI → '+(d.routedTo||'CORE')+'</span><span class="pill">'+(d.retrievalMode||'provider_only')+'</span>';
+  const reply=document.createElement('div');reply.className='reply';reply.style.marginTop='14px';reply.textContent=d.reply||d.error||'No response';
+  const status=document.createElement('div');status.className='status';status.textContent='Approval: '+(d.approvalRequired?'HUMAN APPROVAL REQUIRED':'No additional approval flag')+' • Memories used: '+(d.memoriesUsed||0);
+  if(d.memoryPersisted)status.className+=' memory';
+  card.append(flow,reply,status);ans.replaceChildren(card);
+  input.value='';
+ }catch(e){ans.innerHTML='<div class="card">MASTER AI is currently unavailable.</div>'}
+ finally{button.disabled=false;input.focus()}
+}
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask()});
+</script>
 </body>
 </html>
