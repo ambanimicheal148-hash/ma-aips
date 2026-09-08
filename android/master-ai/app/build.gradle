@@ -1,0 +1,4 @@
+plugins { id 'com.android.application' }
+android { namespace 'ke.co.kais.masterai'; compileSdk 35
+ defaultConfig { applicationId 'ke.co.kais.masterai'; minSdk 23; targetSdk 35; versionCode 1; versionName '1.0' }
+}
