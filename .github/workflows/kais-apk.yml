@@ -18,17 +18,23 @@ jobs:
       - name: Build release APK
         working-directory: android
         run: gradle --no-daemon assembleRelease
+      - name: Prepare APK
+        run: |
+          APK=$(find android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)
+          test -n "$APK"
+          cp "$APK" kais.apk
+          ls -lh kais.apk
       - name: Publish APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: K-AI-S-Android
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: kais.apk
           if-no-files-found: error
       - name: Publish public GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create kais-v1.0.0 android/app/build/outputs/apk/release/app-release.apk \
+          gh release create kais-v1.0.0 kais.apk \
             --title "K.AI.S Android 1.0.0" \
             --notes "Public K.AI.S Android client. Master AI is not included in this APK and remains CEO-only." \
-            --target "${GITHUB_SHA}" || gh release upload kais-v1.0.0 android/app/build/outputs/apk/release/app-release.apk --clobber
+            --target "${GITHUB_SHA}" || gh release upload kais-v1.0.0 kais.apk --clobber
