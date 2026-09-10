@@ -7,7 +7,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
-    private static final String KAIS_URL = "https://ma-aips-ai.hatchable.site/kais.html";
+    private static final String KAIS_URL = "https://ma-aips-ai.hatchable.site/kais-ai.html";
     private WebView webView;
 
     @Override public void onCreate(Bundle state) {
