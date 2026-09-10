@@ -1,4 +1,4 @@
-name: Build K.AI.S APK
+name: Build K.AI.S Android
 on:
   push:
     branches: [main]
@@ -15,26 +15,34 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build release APK
+      - name: Build release APK and App Bundle
         working-directory: android
-        run: gradle --no-daemon assembleRelease
-      - name: Prepare APK
+        run: gradle --no-daemon assembleRelease bundleRelease
+      - name: Prepare public APK
         run: |
           APK=$(find android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)
           test -n "$APK"
           cp "$APK" kais.apk
           ls -lh kais.apk
-      - name: Publish APK artifact
+      - name: Prepare Play Store App Bundle
+        run: |
+          AAB=$(find android/app/build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab' | head -n 1)
+          test -n "$AAB"
+          cp "$AAB" kais-release.aab
+          ls -lh kais-release.aab
+      - name: Publish Android artifacts
         uses: actions/upload-artifact@v4
         with:
           name: K-AI-S-Android
-          path: kais.apk
+          path: |
+            kais.apk
+            kais-release.aab
           if-no-files-found: error
-      - name: Publish public GitHub release
+      - name: Publish public APK release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create kais-v1.0.0 kais.apk \
-            --title "K.AI.S Android 1.0.0" \
-            --notes "Public K.AI.S Android client. Master AI is not included in this APK and remains CEO-only." \
-            --target "${GITHUB_SHA}" || gh release upload kais-v1.0.0 kais.apk --clobber
+          gh release create kais-v1.0.1 kais.apk \
+            --title "K.AI.S Android 1.0.1" \
+            --notes "Public K.AI.S Android client. Master AI is not included in this public client and remains CEO-only." \
+            --target "${GITHUB_SHA}" || gh release upload kais-v1.0.1 kais.apk --clobber
