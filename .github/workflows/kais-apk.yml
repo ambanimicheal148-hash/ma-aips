@@ -18,7 +18,7 @@ jobs:
       - name: Build K.AI.S release APK and App Bundle
         working-directory: android
         run: gradle --no-daemon :app:assembleRelease :app:bundleRelease
-      - name: Build MASTER AI release APK and App Bundle
+      - name: Build MASTER AI War Room release APK and App Bundle
         working-directory: android
         run: gradle --no-daemon :master:assembleRelease :master:bundleRelease
       - name: Prepare K.AI.S artifacts
@@ -28,13 +28,13 @@ jobs:
           test -n "$APK" && test -n "$AAB"
           cp "$APK" kais.apk
           cp "$AAB" kais-release.aab
-      - name: Prepare MASTER AI artifacts
+      - name: Prepare MASTER AI War Room artifacts
         run: |
           APK=$(find android/master/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)
           AAB=$(find android/master/build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab' | head -n 1)
           test -n "$APK" && test -n "$AAB"
-          cp "$APK" master-ai.apk
-          cp "$AAB" master-ai-release.aab
+          cp "$APK" master-ai-war-room.apk
+          cp "$AAB" master-ai-war-room-release.aab
       - name: Publish Android artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -42,8 +42,8 @@ jobs:
           path: |
             kais.apk
             kais-release.aab
-            master-ai.apk
-            master-ai-release.aab
+            master-ai-war-room.apk
+            master-ai-war-room-release.aab
           if-no-files-found: error
       - name: Publish public K.AI.S APK release
         env:
@@ -53,3 +53,11 @@ jobs:
             --title "K.AI.S Android 1.0.1" \
             --notes "Public K.AI.S Android client. Master AI is not included in this public client and remains CEO-only." \
             --target "${GITHUB_SHA}" || gh release upload kais-v1.0.1 kais.apk --clobber
+      - name: Publish private MASTER AI War Room APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create master-ai-war-room-v1.1.0 master-ai-war-room.apk \
+            --title "MASTER AI War Room Android 1.1.0" \
+            --notes "Private CEO-only MASTER AI War Room companion. Backend admin access remains enforced; no admin secret is embedded in the APK." \
+            --target "${GITHUB_SHA}" || gh release upload master-ai-war-room-v1.1.0 master-ai-war-room.apk --clobber
