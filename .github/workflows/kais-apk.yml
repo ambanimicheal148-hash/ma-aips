@@ -1,4 +1,4 @@
-name: Build K.AI.S Android
+name: Build MA.AI.P.S Android Apps
 on:
   push:
     branches: [main]
@@ -15,30 +15,37 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build release APK and App Bundle
+      - name: Build K.AI.S release APK and App Bundle
         working-directory: android
-        run: gradle --no-daemon assembleRelease bundleRelease
-      - name: Prepare public APK
+        run: gradle --no-daemon :app:assembleRelease :app:bundleRelease
+      - name: Build MASTER AI release APK and App Bundle
+        working-directory: android
+        run: gradle --no-daemon :master:assembleRelease :master:bundleRelease
+      - name: Prepare K.AI.S artifacts
         run: |
           APK=$(find android/app/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)
-          test -n "$APK"
-          cp "$APK" kais.apk
-          ls -lh kais.apk
-      - name: Prepare Play Store App Bundle
-        run: |
           AAB=$(find android/app/build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab' | head -n 1)
-          test -n "$AAB"
+          test -n "$APK" && test -n "$AAB"
+          cp "$APK" kais.apk
           cp "$AAB" kais-release.aab
-          ls -lh kais-release.aab
+      - name: Prepare MASTER AI artifacts
+        run: |
+          APK=$(find android/master/build/outputs/apk/release -maxdepth 1 -type f -name '*.apk' | head -n 1)
+          AAB=$(find android/master/build/outputs/bundle/release -maxdepth 1 -type f -name '*.aab' | head -n 1)
+          test -n "$APK" && test -n "$AAB"
+          cp "$APK" master-ai.apk
+          cp "$AAB" master-ai-release.aab
       - name: Publish Android artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: K-AI-S-Android
+          name: MA-AI-PS-Android
           path: |
             kais.apk
             kais-release.aab
+            master-ai.apk
+            master-ai-release.aab
           if-no-files-found: error
-      - name: Publish public APK release
+      - name: Publish public K.AI.S APK release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
