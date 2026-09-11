@@ -19,99 +19,145 @@ public class MainActivity extends Activity {
     private LinearLayout messages;
     private EditText input;
     private Button send;
+    private TextView status;
+    private TextView council;
+    private TextView security;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        buildUi();
+        buildWarRoom();
+        refreshStatus();
     }
 
-    private void buildUi() {
+    private TextView label(String text, int size) {
+        TextView v = new TextView(this);
+        v.setText(text);
+        v.setTextSize(size);
+        v.setTextColor(Color.rgb(230, 238, 242));
+        v.setPadding(12, 8, 12, 8);
+        return v;
+    }
+
+    private void buildWarRoom() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(24, 24, 24, 16);
-        root.setBackgroundColor(Color.WHITE);
+        root.setPadding(18, 18, 18, 14);
+        root.setBackgroundColor(Color.rgb(8, 20, 28));
 
-        TextView title = new TextView(this);
-        title.setText("MASTER AI");
-        title.setTextSize(28);
-        title.setTextColor(Color.rgb(3, 49, 70));
+        TextView title = label("MASTER AI WAR ROOM", 25);
         title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.WHITE);
         root.addView(title, new LinearLayout.LayoutParams(-1, -2));
 
-        TextView subtitle = new TextView(this);
-        subtitle.setText("MA.AI.P.S Executive Commander • CEO Access");
-        subtitle.setGravity(Gravity.CENTER);
-        subtitle.setTextColor(Color.DKGRAY);
-        subtitle.setPadding(0, 4, 0, 12);
-        root.addView(subtitle, new LinearLayout.LayoutParams(-1, -2));
+        TextView sub = label("MA.AI.PS • CEO COMMAND CENTER • PRIVATE", 12);
+        sub.setGravity(Gravity.CENTER);
+        root.addView(sub, new LinearLayout.LayoutParams(-1, -2));
+
+        LinearLayout cards = new LinearLayout(this);
+        cards.setOrientation(LinearLayout.VERTICAL);
+        status = label("SYSTEM: CHECKING...", 14);
+        council = label("COUNCIL: CHECKING...", 14);
+        security = label("SECURITY: CHECKING...", 14);
+        cards.addView(status);
+        cards.addView(council);
+        cards.addView(security);
+        root.addView(cards);
+
+        Button refresh = new Button(this);
+        refresh.setText("REFRESH WAR ROOM");
+        refresh.setOnClickListener(v -> refreshStatus());
+        root.addView(refresh, new LinearLayout.LayoutParams(-1, -2));
 
         ScrollView scroll = new ScrollView(this);
         messages = new LinearLayout(this);
         messages.setOrientation(LinearLayout.VERTICAL);
-        messages.setPadding(0, 12, 0, 12);
+        messages.setPadding(0, 10, 0, 10);
         scroll.addView(messages);
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
 
         LinearLayout composer = new LinearLayout(this);
+        composer.setOrientation(LinearLayout.HORIZONTAL);
         input = new EditText(this);
-        input.setHint("Give MASTER AI a command...");
+        input.setHint("CEO command...");
+        input.setTextColor(Color.WHITE);
+        input.setHintTextColor(Color.LTGRAY);
         input.setSingleLine(false);
-        Button button = new Button(this);
-        button.setText("SEND");
+        send = new Button(this);
+        send.setText("SEND");
         composer.addView(input, new LinearLayout.LayoutParams(0, -2, 1));
-        composer.addView(button, new LinearLayout.LayoutParams(-2, -2));
+        composer.addView(send, new LinearLayout.LayoutParams(-2, -2));
         root.addView(composer);
-        button.setOnClickListener(v -> submit(button));
+        send.setOnClickListener(v -> submit());
 
-        addMessage("MASTER AI", "CEO command center ready. Access is enforced by the MA.AI.P.S executive backend.");
+        addMessage("MASTER AI", "War Room ready. CEO commands are sent only to the admin-gated MASTER AI backend.");
         setContentView(root);
     }
 
     private void addMessage(String who, String text) {
-        TextView v = new TextView(this);
-        v.setText(who + ": " + text);
-        v.setTextSize(16);
-        v.setTextColor(Color.rgb(25,25,25));
-        v.setPadding(8, 10, 8, 10);
+        TextView v = label(who + ": " + text, 15);
+        v.setTextColor(Color.WHITE);
         messages.addView(v);
     }
 
-    private void submit(Button button) {
+    private void refreshStatus() {
+        executor.execute(() -> {
+            try {
+                JSONObject json = request("GET", null);
+                JSONObject snap = json.getJSONObject("snapshot");
+                final String s = "SYSTEM: " + snap.optString("status") + " • " + snap.optString("pulse");
+                JSONObject c = snap.optJSONObject("council");
+                final String co = "COUNCIL: " + (c == null ? "UNKNOWN" : c.optString("quorum"));
+                JSONObject sec = snap.optJSONObject("security_team");
+                final String se = "SECURITY: " + (sec == null ? "UNKNOWN" : sec.optString("status"));
+                runOnUiThread(() -> { status.setText(s); council.setText(co); security.setText(se); });
+            } catch (Exception e) {
+                runOnUiThread(() -> { status.setText("SYSTEM: CEO AUTHENTICATION REQUIRED"); council.setText("COUNCIL: LOCKED"); security.setText("SECURITY: BACKEND ENFORCED"); });
+            }
+        });
+    }
+
+    private void submit() {
         String command = input.getText().toString().trim();
         if (command.isEmpty()) return;
         input.setText("");
         addMessage("CEO", command);
-        button.setEnabled(false);
-        button.setText("...");
+        send.setEnabled(false);
+        send.setText("...");
         executor.execute(() -> {
             String reply;
-            try { reply = requestMaster(command); }
-            catch (Exception e) { reply = "MASTER AI is unavailable or this device is not authenticated for CEO access."; }
+            try {
+                JSONObject body = new JSONObject();
+                body.put("command", command);
+                JSONObject json = request("POST", body);
+                reply = json.optString("report", json.optString("error", "No executive response."));
+            } catch (Exception e) {
+                reply = "CEO authentication is required for this War Room connection. The backend rejected the request safely.";
+            }
             final String result = reply;
-            runOnUiThread(() -> { addMessage("MASTER AI", result); button.setEnabled(true); button.setText("SEND"); });
+            runOnUiThread(() -> { addMessage("MASTER AI", result); send.setEnabled(true); send.setText("SEND"); });
         });
     }
 
-    private String requestMaster(String command) throws Exception {
+    private JSONObject request(String method, JSONObject body) throws Exception {
         HttpURLConnection c = (HttpURLConnection) new URL(API_URL).openConnection();
-        c.setRequestMethod("POST");
+        c.setRequestMethod(method);
         c.setConnectTimeout(15000);
         c.setReadTimeout(30000);
-        c.setDoOutput(true);
-        c.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        JSONObject body = new JSONObject();
-        body.put("command", command);
-        try (OutputStream out = c.getOutputStream()) { out.write(body.toString().getBytes(StandardCharsets.UTF_8)); }
-        int status = c.getResponseCode();
-        InputStream stream = status >= 400 ? c.getErrorStream() : c.getInputStream();
+        c.setRequestProperty("Accept", "application/json");
+        if (body != null) {
+            c.setDoOutput(true);
+            c.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            try (OutputStream out = c.getOutputStream()) { out.write(body.toString().getBytes(StandardCharsets.UTF_8)); }
+        }
+        int statusCode = c.getResponseCode();
+        InputStream stream = statusCode >= 400 ? c.getErrorStream() : c.getInputStream();
         if (stream == null) throw new Exception("No response");
         StringBuilder result = new StringBuilder();
         try (BufferedReader r = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             String line; while ((line = r.readLine()) != null) result.append(line);
         }
-        if (status < 200 || status >= 300) throw new Exception("HTTP " + status);
-        JSONObject json = new JSONObject(result.toString());
-        return json.optString("report", json.optString("error", "No executive response received."));
+        if (statusCode < 200 || statusCode >= 300) throw new Exception("HTTP " + statusCode);
+        return new JSONObject(result.toString());
     }
 
     @Override protected void onDestroy() {
