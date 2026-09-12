@@ -1,8 +1,7 @@
 name: Build K.AI.S APK
 
 on:
-  push:
-    branches: [kais-apk]
+  pull_request:
     paths:
       - 'android/**'
       - '.github/workflows/build-kais-apk.yml'
