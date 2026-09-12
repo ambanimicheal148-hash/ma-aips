@@ -40,3 +40,5 @@ jobs:
           name: master-ai-war-room-apk
           path: android/master-ai/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+# Trigger a fresh build on the corrected verification step.
