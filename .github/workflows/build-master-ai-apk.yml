@@ -2,7 +2,7 @@ name: Build Master AI APK
 
 on:
   push:
-    branches: [main]
+    branches: [master-ai-apk]
     paths:
       - 'android/master-ai/**'
       - '.github/workflows/build-master-ai-apk.yml'
@@ -22,7 +22,7 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
@@ -40,13 +40,3 @@ jobs:
           name: master-ai-war-room-apk
           path: android/master-ai/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-      - name: Publish verified APK release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TAG="master-ai-war-room-v1.2.1"
-          gh release delete "$TAG" --yes 2>/dev/null || true
-          gh release create "$TAG" android/master-ai/app/build/outputs/apk/debug/app-debug.apk \
-            --title "MASTER AI War Room v1.2.1" \
-            --notes "Verified debug APK for the private MASTER AI War Room. The app opens the live War Room URL and contains no embedded AI provider API keys." \
-            --latest
