@@ -9,5 +9,10 @@
   },
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.18",
+    "pino": "^9.7.0",
+    "qrcode": "^1.5.4"
   }
 }
