@@ -1,0 +1,45 @@
+name: Build K.A.I.S and MASTER AI APKs
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-apks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Build MASTER AI debug APK
+        run: gradle -p public/android/master-ai assembleDebug --no-daemon
+
+      - name: Build K.A.I.S debug APK
+        run: gradle -p public/android/kais assembleDebug --no-daemon
+
+      - name: Collect APKs
+        run: |
+          mkdir -p release-apks
+          cp public/android/master-ai/app/build/outputs/apk/debug/app-debug.apk release-apks/master-ai.apk
+          cp public/android/kais/app/build/outputs/apk/debug/app-debug.apk release-apks/kais.apk
+
+      - name: Upload installable APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ma-aips-android-apks
+          path: release-apks/*.apk
+          if-no-files-found: error
