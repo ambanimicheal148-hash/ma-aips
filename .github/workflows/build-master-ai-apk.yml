@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -29,16 +29,17 @@ jobs:
       - name: Build debug APK
         working-directory: android/master-ai
         run: gradle --no-daemon :app:assembleDebug
-      - name: Verify APK exists and is a valid ZIP/APK
+      - name: Verify APK payload
         run: |
-          test -f android/master-ai/app/build/outputs/apk/debug/app-debug.apk
-          unzip -t android/master-ai/app/build/outputs/apk/debug/app-debug.apk >/dev/null
-          stat -c '%n %s bytes' android/master-ai/app/build/outputs/apk/debug/app-debug.apk
-      - name: Upload workflow artifact
+          APK="android/master-ai/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          file "$APK"
+          unzip -t "$APK"
+          unzip -l "$APK" | grep -q 'AndroidManifest.xml'
+          stat -c '%n %s bytes' "$APK"
+      - name: Upload Master AI APK
         uses: actions/upload-artifact@v4
         with:
           name: master-ai-war-room-apk
           path: android/master-ai/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-
-# Trigger a fresh build on the corrected verification step.
