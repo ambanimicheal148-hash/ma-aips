@@ -92,8 +92,18 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, "0.0.0.0", async () => {
   console.log(`MA-AIPS Railway server listening on port ${PORT}`);
-  if (process.env.WHATSAPP_MODE === "baileys") {
-    try { const { startWhatsApp } = await import("./lib/whatsapp.js"); await startWhatsApp(); }
-    catch (error) { console.error("WhatsApp bridge failed to start:", error); }
+  const whatsappMode = String(process.env.WHATSAPP_MODE || "").trim().toLowerCase();
+  const whatsappAuthDir = String(process.env.WHATSAPP_AUTH_DIR || "").trim();
+  console.log(`WhatsApp bridge config: mode=${whatsappMode || "unset"}, authDir=${whatsappAuthDir || "unset"}`);
+  if (whatsappMode === "baileys" || whatsappAuthDir) {
+    try {
+      const { startWhatsApp } = await import("./lib/whatsapp.js");
+      await startWhatsApp();
+      console.log("WhatsApp bridge initialization requested");
+    } catch (error) {
+      console.error("WhatsApp bridge failed to start:", error);
+    }
+  } else {
+    console.log("WhatsApp bridge disabled: WHATSAPP_MODE/WHATSAPP_AUTH_DIR not configured");
   }
 });
