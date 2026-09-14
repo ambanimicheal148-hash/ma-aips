@@ -15,7 +15,7 @@
   "dependencies": {
     "@capacitor/android": "^7.4.4",
     "@capacitor/core": "^7.4.4",
-    "@whiskeysockets/baileys": "^6.7.24",
+    "@whiskeysockets/baileys": "6.7.23",
     "pino": "^9.7.0",
     "qrcode": "^1.5.4"
   },
