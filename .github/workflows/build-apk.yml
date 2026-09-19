@@ -1,12 +1,15 @@
-name: Build K.A.I.S Android APK
+name: Build Supreme AI Commander Android APK
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  build-apk:
+  build-saic-apk:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,14 +36,19 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build debug APK
+      - name: Build installable debug APK
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Verify APK exists
+        run: |
+          test -f android/app/build/outputs/apk/debug/app-debug.apk
+          file android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload Supreme AI Commander APK
         uses: actions/upload-artifact@v4
         with:
-          name: kais-debug-apk
+          name: supreme-ai-commander-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
