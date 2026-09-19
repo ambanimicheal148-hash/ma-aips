@@ -20,6 +20,7 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.4"
+    "@capacitor/cli": "^7.4.4",
+    "typescript": "^5.9.2"
   }
 }
