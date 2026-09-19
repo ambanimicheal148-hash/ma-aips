@@ -1,6 +1,6 @@
 {
-  "appId": "ke.co.kais.app",
-  "appName": "K.A.I.S",
+  "appId": "ke.co.kais.saic",
+  "appName": "Supreme AI Commander",
   "webDir": "public",
   "server": {
     "url": "https://ma-aips-ai.hatchable.site/",
