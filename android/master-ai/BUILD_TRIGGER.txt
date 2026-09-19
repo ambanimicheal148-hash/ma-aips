@@ -1,1 +1,2 @@
-MASTER AI War Room APK build trigger — rebuild requested 2026-09-13.
+APK BUILD TRIGGER — 2026-09-20
+Build K.AI.S and S_AI_C installable Android APKs from main.
