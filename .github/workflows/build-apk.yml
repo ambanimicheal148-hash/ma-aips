@@ -24,8 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Add Android platform
-        run: npx cap add android
+      - name: Recreate clean Android project
+        run: |
+          rm -rf android
+          npx cap add android
 
       - name: Sync Capacitor
         run: npx cap sync android
@@ -42,7 +44,7 @@ jobs:
 
       - name: Verify APK exists
         run: |
-          test -f android/app/build/outputs/apk/debug/app-debug.apk
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
           file android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload Supreme AI Commander APK
