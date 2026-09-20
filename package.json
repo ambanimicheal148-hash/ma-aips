@@ -17,7 +17,9 @@
     "@capacitor/core": "^7.4.4",
     "@whiskeysockets/baileys": "6.7.23",
     "pino": "^9.7.0",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "sharp": "^0.33.5",
+    "ffmpeg-static": "^5.2.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
