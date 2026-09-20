@@ -14,7 +14,8 @@ const API_ROUTES = {
   "/api/master": "./api/master.js",
   "/api/mbna/program": "./api/mbna/program.js",
   "/api/whatsapp/status": "./api/whatsapp/status.js",
-  "/api/whatsapp/qr": "./api/whatsapp/qr.js"
+  "/api/whatsapp/qr": "./api/whatsapp/qr.js",
+  "/api/studio": "./api/studio.js"
 };
 
 const MIME = {
