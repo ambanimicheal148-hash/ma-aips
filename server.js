@@ -95,7 +95,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, "0.0.0.0", async () => {
   console.log(`MA-AIPS Railway server listening on port ${PORT}`);
-  const whatsappMode = String(process.env.WHATSAPP_MODE || "").trim().toLowerCase();
+  const whatsappMode = String(process.env.WHATSAPP_MODE || "baileys").trim().toLowerCase();
   const whatsappAuthDir = String(process.env.WHATSAPP_AUTH_DIR || "").trim();
   console.log(`WhatsApp bridge config: mode=${whatsappMode || "unset"}, authDir=${whatsappAuthDir || "unset"}`);
   if (whatsappMode === "baileys" || whatsappAuthDir) {
