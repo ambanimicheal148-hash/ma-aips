@@ -12,6 +12,7 @@ const API_ROUTES = {
   "/api/chat": "./api/chat.js",
   "/api/kais/chat": "./api/kais/chat.js",
   "/api/master": "./api/master.js",
+  "/api/sai-c/network": "./api/sai-c/network.js",
   "/api/mbna/program": "./api/mbna/program.js",
   "/api/whatsapp/status": "./api/whatsapp/status.js",
   "/api/whatsapp/qr": "./api/whatsapp/qr.js",
