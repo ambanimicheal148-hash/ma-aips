@@ -1,0 +1,11 @@
+customer_id,business_type,target_person,location,language,service,price_kes,voice_input_received,payment_verified,kit_delivered,used_same_day,feedback,permission_to_record_testimony,next_action
+PF01,chips_shop,owner,Githunguri,Sheng,Real Business Kit,50,,,,,,,
+PF02,salon,owner,Githunguri,Swahili,Real Business Kit,50,,,,,,,
+PF03,mama_mboga,owner,Githunguri,Sheng,Bei ya Leo,50,,,,,,,
+PF04,church,organizer,Githunguri,Swahili,Church Poster,50,,,,,,,
+PF05,farm,farmer,Githunguri,Dholuo,Farm Produce Poster,50,,,,,,,
+PF06,boda_sacco,secretary,Githunguri,Swahili,Poster + Price List,50,,,,,,,
+PF07,kinyozi,owner,Githunguri,Sheng,Poster Biashara,50,,,,,,,
+PF08,boutique,owner,Githunguri,Swahili,Business Kit,50,,,,,,,
+PF09,hardware,owner,Githunguri,Sheng,Price List + Status,50,,,,,,,
+PF10,school,administrator,Githunguri,Swahili,School Poster,50,,,,,,,
