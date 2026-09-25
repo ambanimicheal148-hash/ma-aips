@@ -208,17 +208,20 @@ server.listen(PORT, "0.0.0.0", async () => {
   console.log(`capacity api_inflight=${MAX_API_INFLIGHT} expensive_inflight=${MAX_EXPENSIVE_INFLIGHT} rate_per_minute=${RATE_LIMIT}`);
   const whatsappMode = String(process.env.WHATSAPP_MODE || "baileys").trim().toLowerCase();
   const whatsappAuthDir = String(process.env.WHATSAPP_AUTH_DIR || "").trim();
-  console.log(`WhatsApp bridge config: mode=${whatsappMode || "unset"}, authDir=${whatsappAuthDir || "unset"}`);
-  if (whatsappMode === "baileys" || whatsappAuthDir) {
+  const whatsappPrimary = String(process.env.WHATSAPP_BRIDGE_PRIMARY || "false").trim().toLowerCase() === "true";
+  console.log(`WhatsApp bridge config: mode=${whatsappMode || "unset"}, authDir=${whatsappAuthDir || "unset"}, primary=${whatsappPrimary}`);
+  // API replicas are stateless. The stateful WhatsApp bridge must run as a dedicated worker,
+  // never once per API replica, otherwise a scale-out can create competing sessions and delay health.
+  if (whatsappPrimary && (whatsappMode === "baileys" || whatsappAuthDir)) {
     try {
       const { startWhatsApp } = await import("./lib/whatsapp.js");
       await startWhatsApp();
-      console.log("WhatsApp bridge initialization requested");
+      console.log("WhatsApp bridge initialization requested on dedicated primary");
     } catch (error) {
       console.error("WhatsApp bridge failed to start:", error);
     }
   } else {
-    console.log("WhatsApp bridge disabled: WHATSAPP_MODE/WHATSAPP_AUTH_DIR not configured");
+    console.log("WhatsApp bridge not started in this API replica");
   }
 });
 
