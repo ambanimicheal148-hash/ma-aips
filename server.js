@@ -17,7 +17,8 @@ const API_ROUTES = {
   "/api/whatsapp/status": "./api/whatsapp/status.js",
   "/api/whatsapp/qr": "./api/whatsapp/qr.js",
   "/api/studio": "./api/studio.js",
-  "/api/studio/track": "./api/studio-track.js"
+  "/api/studio/track": "./api/studio-track.js",
+  "/api/closed-loop-proof": "./api/closed-loop-proof.js"
 };
 
 const MIME = {
