@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<meta name="description" content="VELTRION — an independent intelligence systems federation.">
+<title>VELTRION — Intelligence Systems Federation</title>
+<style>
+:root{color-scheme:dark;--bg:#07111f;--panel:#0d1b2d;--line:#203b58;--text:#edf5ff;--muted:#9db2c9;--blue:#4bb7f5;--cyan:#6ee7f9;--green:#19c879}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(ellipse at 50% -15%,#16456b 0,transparent 55%),linear-gradient(160deg,#07111f,#081626 65%,#06101b);color:var(--text);min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px clamp(18px,5vw,72px);border-bottom:1px solid #1a3048} .brand{font-weight:800;letter-spacing:.2em;font-size:1.05rem}.tag{font-size:.76rem;color:var(--cyan);letter-spacing:.15em;text-transform:uppercase}
+main{max-width:1120px;margin:auto;padding:clamp(35px,7vw,84px) 20px}.hero{text-align:center;max-width:800px;margin:0 auto 45px}.eyebrow{color:var(--cyan);text-transform:uppercase;letter-spacing:.19em;font-size:.75rem;font-weight:700}.hero h1{font-size:clamp(2.5rem,7vw,5.4rem);line-height:1.02;letter-spacing:-.055em;margin:18px 0;background:linear-gradient(100deg,#fff,#8edbff 55%,#a7c9ff);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{color:var(--muted);font-size:clamp(1rem,2vw,1.18rem);max-width:660px;margin:0 auto 27px}.start{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 27px;border-radius:12px;background:var(--green);color:#03180f;text-decoration:none;font-weight:800;box-shadow:0 8px 32px #19c87925;transition:transform .15s,filter .15s}.start:hover{transform:translateY(-2px);filter:brightness(1.08)}.start:focus-visible,a:focus-visible{outline:3px solid white;outline-offset:4px}
+.hidden{display:none}.systems-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:55px 0 18px}.systems-head h2{margin:0;font-size:1.45rem}.systems-head p{margin:0;color:var(--muted);font-size:.9rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{position:relative;overflow:hidden;background:linear-gradient(145deg,#10243a,#0a1727);border:1px solid var(--line);border-radius:18px;padding:25px;min-height:190px;display:flex;flex-direction:column;align-items:flex-start}.card:before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;border:1px solid #4bb7f522;right:-65px;top:-72px;box-shadow:0 0 0 18px #4bb7f508,0 0 0 38px #4bb7f505}.number{font-size:.72rem;letter-spacing:.16em;color:var(--cyan);font-weight:700}.card h3{font-size:1.55rem;margin:12px 0 5px}.card p{margin:0 0 22px;color:var(--muted);max-width:370px}.open{margin-top:auto;color:#a9e4ff;text-decoration:none;border:1px solid #376080;border-radius:9px;padding:9px 14px;font-weight:700}.open:hover{background:#163650}.role{font-size:.78rem;color:#a8c4dd;margin-bottom:12px}
+.note{margin-top:28px;padding:17px 19px;border:1px solid #293b50;border-radius:12px;background:#091523;color:var(--muted);font-size:.88rem}.note strong{color:#e8f3ff}footer{padding:25px 20px;text-align:center;color:#7f97af;border-top:1px solid #1a3048;font-size:.82rem}.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:8px}
+@media(max-width:640px){header{padding:18px}.grid{grid-template-columns:1fr}.systems-head{align-items:start;flex-direction:column}.card{min-height:175px}.hero{margin-bottom:25px}}
+</style>
+</head>
+<body>
+<header><div class="brand">VELTRION</div><div class="tag">Federation portal</div></header>
+<main>
+<section class="hero">
+<div class="eyebrow">Independent in operation · United in purpose</div>
+<h1>Intelligence,<br>working together.</h1>
+<p>A federation built to help independent systems cooperate through clear responsibilities, explicit permissions and verifiable outcomes—without taking away each system’s independence.</p>
+<button class="start" id="start" type="button">▶ &nbsp; Open VELTRION</button>
+</section>
+<section id="systems" class="hidden" aria-live="polite">
+<div class="systems-head"><div><div class="eyebrow">Federation directory</div><h2>Choose a system</h2></div><p>Four independent systems · one shared direction</p></div>
+<div class="grid">
+<article class="card"><div class="number">SYSTEM 01</div><h3>AUREVIA</h3><div class="role">Execution</div><p>Turns authorized plans into actions and useful deliverables.</p><a class="open" href="https://ma-aips-ai.hatchable.site/" target="_blank" rel="noopener noreferrer">Open AUREVIA ↗</a></article>
+<article class="card"><div class="number">SYSTEM 02</div><h3>NEXUS</h3><div class="role">Verification</div><p>Checks evidence, claims and outcomes independently.</p><a class="open" href="https://nexusai-trusted.hatchable.site/" target="_blank" rel="noopener noreferrer">Open NEXUS ↗</a></article>
+<article class="card"><div class="number">SYSTEM 03</div><h3>VERENTA</h3><div class="role">Coordination &amp; recovery</div><p>Coordinates agreed workflows and helps recover from failures.</p><a class="open" href="https://arc-independent.hatchable.site/" target="_blank" rel="noopener noreferrer">Open VERENTA ↗</a></article>
+<article class="card"><div class="number">SYSTEM 04</div><h3>ELARA</h3><div class="role">Connectivity</div><p>Connects people, services and participating systems.</p><a class="open" href="https://elara-world-mesh.hatchable.site/" target="_blank" rel="noopener noreferrer">Open ELARA ↗</a></article>
+</div>
+<div class="note"><strong>Shared intelligence foundation: CANONIA.</strong> CANONIA is the shared intelligence paradigm—not a fifth peer system. Federation participation must use explicit, authenticated contracts. This portal does not claim live health checks or authorize cross-system execution. If a destination requests sign-in, its project is not yet publicly accessible.</div>
+</section>
+</main>
+<footer><span class="pulse"></span>VELTRION · Independent systems. Explicit cooperation. Evidence before claims.</footer>
+<script>
+const button=document.getElementById('start'),systems=document.getElementById('systems');
+button.addEventListener('click',()=>{systems.classList.remove('hidden');button.textContent='✓ Systems available below';button.setAttribute('aria-expanded','true');systems.scrollIntoView({behavior:'smooth',block:'start'});});
+button.setAttribute('aria-expanded','false');
+</script>
+</body></html>
